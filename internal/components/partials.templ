@@ -1,0 +1,28 @@
+package components
+
+templ Header() {
+	<header class="w-full border-b border-neutral-200 bg-white/80 backdrop-blur">
+		<div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+			<a href="/" class="text-lg font-semibold tracking-tight text-neutral-900">gothcc</a>
+			<nav class="text-sm text-neutral-500">HTMX · templ · sqlc · Tailwind · chi</nav>
+		</div>
+	</header>
+}
+
+templ Footer() {
+	<footer class="w-full border-t border-neutral-200 bg-white">
+		<div class="max-w-5xl mx-auto px-6 py-6 text-sm text-neutral-500 flex flex-wrap items-center justify-between gap-2">
+			<span>gothcc starter template</span>
+			<span>
+				Built with
+				<a href="https://go.dev/" class="underline hover:text-neutral-700">Go</a>,
+				<a href="https://github.com/go-chi/chi" class="underline hover:text-neutral-700">chi</a>,
+				<a href="https://templ.guide/" class="underline hover:text-neutral-700">templ</a>,
+				<a href="https://tailwindcss.com/" class="underline hover:text-neutral-700">Tailwind</a>,
+				<a href="https://htmx.org/" class="underline hover:text-neutral-700">HTMX</a>
+				&amp;
+				<a href="https://sqlc.dev/" class="underline hover:text-neutral-700">sqlc</a>
+			</span>
+		</div>
+	</footer>
+}

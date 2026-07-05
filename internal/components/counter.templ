@@ -1,0 +1,8 @@
+package components
+
+import "strconv"
+
+// CounterValue is the bare HTMX fragment swapped into #counter-value.
+templ CounterValue(count int64) {
+	<span id="counter-value" class="tabular-nums text-4xl font-semibold text-neutral-900">{ strconv.FormatInt(count, 10) }</span>
+}

@@ -1,0 +1,31 @@
+{
+  // Treat .templ as the templ language (NOT html) so Prettier / the built-in
+  // HTML formatter never claims it. The HTML formatter hard-wraps long lines —
+  // including inside Go string literals — which produces invalid Go and breaks
+  // `templ generate` with errors like "invalid go expression: unbalanced '}'".
+  "files.associations": {
+    "*.templ": "templ"
+  },
+
+  // Use ONLY the official templ extension's formatter for .templ, and let it
+  // format on save. templ fmt is safe: it retabs and reflows HTML but never
+  // touches Go expressions/string literals.
+  "[templ]": {
+    "editor.defaultFormatter": "a-h.templ",
+    "editor.formatOnSave": true
+  },
+
+  // Tailwind IntelliSense + Emmet inside .templ files.
+  "tailwindCSS.includeLanguages": {
+    "templ": "html"
+  },
+  "emmet.includeLanguages": {
+    "templ": "html"
+  },
+
+  // Keep gofmt/goimports on the Go side.
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true
+  }
+}

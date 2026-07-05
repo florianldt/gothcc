@@ -1,0 +1,10 @@
+.git
+.env
+bin/
+tmp/
+tailwindcss
+static/css/app.css
+README.md
+CLAUDE.md
+docker-compose.yml
+.github

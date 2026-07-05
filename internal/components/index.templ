@@ -1,0 +1,99 @@
+package components
+
+import "example.com/gothcc/internal/database/db"
+
+templ Index(count int64, messages []db.Message) {
+	@Layout("gothcc — HTMX · templ · sqlc · Tailwind · chi", "A minimal Go web starter.") {
+		<section class="mb-16">
+			<p class="text-xs uppercase tracking-widest text-neutral-500 mb-3">Starter template</p>
+			<h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-neutral-900 mb-4">
+				HTMX · templ · sqlc · Tailwind · chi
+			</h1>
+			<p class="text-lg text-neutral-600 max-w-2xl">
+				A minimal full-stack Go starter. Server-rendered HTML with type-safe templates,
+				HTMX for interactivity, Tailwind for styling, and sqlc + pgx for the database.
+			</p>
+		</section>
+		<section class="mb-16 rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
+			<h2 class="text-xl font-semibold text-neutral-900 mb-1">HTMX counter</h2>
+			<p class="text-sm text-neutral-500 mb-6">
+				Buttons POST to the server; the response is a templ-rendered fragment swapped into the page.
+			</p>
+			<div class="flex items-center gap-6">
+				<button
+					class="w-12 h-12 rounded-lg border border-neutral-200 text-2xl text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200"
+					hx-post="/counter/dec"
+					hx-target="#counter-value"
+					hx-swap="outerHTML"
+				>
+					−
+				</button>
+				@CounterValue(count)
+				<button
+					class="w-12 h-12 rounded-lg border border-neutral-200 text-2xl text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200"
+					hx-post="/counter/inc"
+					hx-target="#counter-value"
+					hx-swap="outerHTML"
+				>
+					+
+				</button>
+			</div>
+		</section>
+		<section class="mb-16 rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
+			<h2 class="text-xl font-semibold text-neutral-900 mb-1">Messages</h2>
+			<p class="text-sm text-neutral-500 mb-6">
+				A tiny persisted example: the form POSTs to <code
+	class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800"
+>/messages</code>,
+				sqlc writes the row to Postgres, and the refreshed list fragment is swapped in.
+			</p>
+			<form
+				class="flex items-center gap-3 mb-6"
+				hx-post="/messages"
+				hx-target="#message-list"
+				hx-swap="outerHTML"
+				hx-on::after-request="if (event.detail.successful) this.reset()"
+			>
+				<input
+					type="text"
+					name="body"
+					required
+					placeholder="Write a message…"
+					class="flex-1 rounded-lg border border-neutral-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-300"
+				/>
+				<button
+					type="submit"
+					class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+				>
+					Add
+				</button>
+			</form>
+			@MessageList(messages)
+		</section>
+		<section>
+			<h2 class="text-xl font-semibold text-neutral-900 mb-4">Stack pieces</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<article class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+					<h3 class="text-base font-semibold text-neutral-900 mb-2">templ</h3>
+					<div class="text-sm text-neutral-600 leading-relaxed">
+						Type-safe, compile-time-checked components in
+						<code class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800">.templ</code>
+						files, generated to Go. Components live in
+						<code class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800">internal/components/</code>;
+						handlers in <code class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800">internal/handlers/</code>.
+					</div>
+				</article>
+				<article class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+					<h3 class="text-base font-semibold text-neutral-900 mb-2">Tailwind</h3>
+					<div class="text-sm text-neutral-600 leading-relaxed">
+						Utility-first CSS built by the standalone Tailwind CLI — no Node required. Run
+						<code class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800">make css-watch</code>
+						to rebuild live, or
+						<code class="px-1 py-0.5 rounded bg-neutral-100 text-neutral-800">make dev</code>
+						to launch the full dev loop.
+					</div>
+				</article>
+			</div>
+		</section>
+	}
+}

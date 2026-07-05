@@ -1,0 +1,18 @@
+package components
+
+import "example.com/gothcc/internal/database/db"
+
+// MessageList is the HTMX fragment swapped into #message-list.
+templ MessageList(messages []db.Message) {
+	<ul id="message-list" class="divide-y divide-neutral-100">
+		if len(messages) == 0 {
+			<li class="py-3 text-sm text-neutral-400">No messages yet — add one above.</li>
+		}
+		for _, m := range messages {
+			<li class="py-3 flex items-baseline justify-between gap-4">
+				<span class="text-sm text-neutral-800">{ m.Body }</span>
+				<time class="text-xs tabular-nums text-neutral-400">{ m.CreatedAt.Time.Format("2006-01-02 15:04") }</time>
+			</li>
+		}
+	</ul>
+}

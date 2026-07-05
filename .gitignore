@@ -1,0 +1,12 @@
+# Build artifacts
+/bin/
+/tmp/
+
+# Tailwind CLI binary (downloaded via `make setup`) and its build output
+/tailwindcss
+/static/css/app.css
+
+# Local env
+.env
+
+# Generated code (templ *_templ.go, sqlc) IS committed — do not ignore it.

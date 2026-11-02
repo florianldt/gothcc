@@ -8,9 +8,12 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "example.com/gothcc/internal/database/db"
+import (
+	"example.com/gothcc/internal/database/db"
+	"example.com/gothcc/internal/view"
+)
 
-func Index(count int64, messages []db.Message) templ.Component {
+func Index(p view.Page, count int64, messages []db.Message) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -65,7 +68,7 @@ func Index(count int64, messages []db.Message) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout("gothcc — HTMX · templ · sqlc · Tailwind · chi", "A minimal Go web starter.").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(p).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

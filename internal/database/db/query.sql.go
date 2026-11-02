@@ -48,14 +48,3 @@ func (q *Queries) ListMessages(ctx context.Context) ([]Message, error) {
 	}
 	return items, nil
 }
-
-const ping = `-- name: Ping :one
-SELECT 1 AS ok
-`
-
-func (q *Queries) Ping(ctx context.Context) (int32, error) {
-	row := q.db.QueryRow(ctx, ping)
-	var ok int32
-	err := row.Scan(&ok)
-	return ok, err
-}

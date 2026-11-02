@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log/slog"
 	"net/http"
 
 	"example.com/gothcc/internal/components"
@@ -11,12 +10,9 @@ import (
 func (a *App) ShowIndex(w http.ResponseWriter, r *http.Request) {
 	msgs, err := a.queries.ListMessages(r.Context())
 	if err != nil {
-		slog.Error("list messages", "error", err)
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		a.fail(w, r, "list messages", err)
 		return
 	}
-
-	if err := components.Index(a.counter.Load(), msgs).Render(r.Context(), w); err != nil {
-		slog.Error("render index", "error", err)
-	}
+	p := a.page("/", "gothcc: HTMX · templ · sqlc · Tailwind · chi", "A minimal Go web starter.")
+	render(w, r, components.Index(p, a.counter.Load(), msgs))
 }

@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -12,6 +14,14 @@ type Config struct {
 	DatabaseURL string
 	LogLevel    slog.Level
 	Addr        string
+	// AppEnv is "development", "staging" or "production".
+	AppEnv string
+	// BaseURL is the public origin used for canonical and og:url links.
+	BaseURL string
+	// NoIndex asks search engines not to index the site (X-Robots-Tag and
+	// robots.txt). On by default outside production, so a staging deploy
+	// never competes with the real site in search results.
+	NoIndex bool
 }
 
 // Load reads configuration from .env (if present) and the environment.
@@ -24,10 +34,15 @@ func Load() Config {
 		level = slog.LevelInfo
 	}
 
+	appEnv := getenv("APP_ENV", "development")
+
 	return Config{
 		DatabaseURL: mustEnv("DATABASE_URL"),
 		LogLevel:    level,
 		Addr:        getenv("ADDR", "0.0.0.0:8000"),
+		AppEnv:      appEnv,
+		BaseURL:     strings.TrimRight(getenv("BASE_URL", "http://localhost:8000"), "/"),
+		NoIndex:     getenv("NO_INDEX", fmt.Sprint(appEnv != "production")) == "true",
 	}
 }
 

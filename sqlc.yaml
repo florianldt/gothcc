@@ -2,7 +2,7 @@ version: "2"
 sql:
   - engine: "postgresql"
     # sqlc understands goose's "-- +goose Up/Down" markers, so the migrations
-    # double as the schema source — a single source of truth.
+    # double as the schema source: a single source of truth.
     schema: "migrations"
     queries: "queries"
     gen:
@@ -11,3 +11,6 @@ sql:
         out: "internal/database/db"
         sql_package: "pgx/v5"
         emit_json_tags: true
+        # Nullable columns become *string, *time.Time, … instead of
+        # pgtype.Text and friends: nil is NULL, and templates stay plain Go.
+        emit_pointers_for_null_types: true

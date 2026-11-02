@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log/slog"
 	"net/http"
 	"strings"
 
@@ -12,11 +11,10 @@ import (
 func (a *App) ListMessages(w http.ResponseWriter, r *http.Request) {
 	msgs, err := a.queries.ListMessages(r.Context())
 	if err != nil {
-		slog.Error("list messages", "error", err)
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		a.fail(w, r, "list messages", err)
 		return
 	}
-	_ = components.MessageList(msgs).Render(r.Context(), w)
+	render(w, r, components.MessageList(msgs))
 }
 
 // CreateMessage persists a message via sqlc, then returns the refreshed
@@ -25,17 +23,15 @@ func (a *App) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	body := strings.TrimSpace(r.FormValue("body"))
 	if body != "" {
 		if _, err := a.queries.CreateMessage(r.Context(), body); err != nil {
-			slog.Error("create message", "error", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			a.fail(w, r, "create message", err)
 			return
 		}
 	}
 
 	msgs, err := a.queries.ListMessages(r.Context())
 	if err != nil {
-		slog.Error("list messages", "error", err)
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		a.fail(w, r, "list messages", err)
 		return
 	}
-	_ = components.MessageList(msgs).Render(r.Context(), w)
+	render(w, r, components.MessageList(msgs))
 }

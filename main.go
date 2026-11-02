@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -10,18 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	// Embeds the time zone database: the distroless image has none, so
+	// time.LoadLocation would fail there.
+	_ "time/tzdata"
 
+	"example.com/gothcc/internal/components"
 	"example.com/gothcc/internal/config"
 	"example.com/gothcc/internal/database"
 	"example.com/gothcc/internal/handlers"
+	"example.com/gothcc/migrations"
 )
-
-// migrations are embedded into the binary so the runtime image needs nothing but
-// the binary itself. go:embed cannot reach parent/sibling directories, which is
-// why this directive lives in the root package alongside main.
-//
-//go:embed migrations/*.sql
-var migrationsFS embed.FS
 
 func main() {
 	cfg := config.Load()
@@ -29,7 +26,10 @@ func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: cfg.LogLevel,
 	})))
-	slog.Info("starting gothcc server")
+	slog.Info("starting gothcc server", "env", cfg.AppEnv)
+
+	// Content hashes for /static URLs (cache busting after deploys).
+	components.VersionAssets("static")
 
 	// signal-aware root context: cancelled on SIGINT/SIGTERM.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -42,14 +42,24 @@ func main() {
 	}
 	defer pool.Close()
 
-	if err := database.Migrate(pool, migrationsFS); err != nil {
+	if err := database.Migrate(ctx, pool, migrations.FS); err != nil {
 		slog.Error("failed to run migrations", "error", err)
 		os.Exit(1)
 	}
 	slog.Info("database ready")
 
-	app := handlers.New(pool)
-	srv := &http.Server{Addr: cfg.Addr, Handler: app.Routes()}
+	app := handlers.New(handlers.Deps{
+		Pool:    pool,
+		BaseURL: cfg.BaseURL,
+		NoIndex: cfg.NoIndex,
+	})
+	srv := &http.Server{
+		Addr:    cfg.Addr,
+		Handler: app.Routes(),
+		// Bounds how long a client may take to send its headers, so slow
+		// clients can't hold connections open (Slowloris).
+		ReadHeaderTimeout: 10 * time.Second,
+	}
 
 	go func() {
 		slog.Info("server started", "addr", cfg.Addr)

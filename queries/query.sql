@@ -1,6 +1,3 @@
--- name: Ping :one
-SELECT 1 AS ok;
-
 -- name: ListMessages :many
 SELECT id, body, created_at
 FROM messages

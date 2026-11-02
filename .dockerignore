@@ -7,4 +7,5 @@ static/css/app.css
 README.md
 CLAUDE.md
 docker-compose.yml
+.air.toml
 .github

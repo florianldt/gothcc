@@ -1,16 +1,52 @@
 package components
 
-// Layout is the base page wrapper. Content is passed as templ children, the
-// equivalent of Askama's {% block content %}.
-templ Layout(title, description string) {
+import "example.com/gothcc/internal/view"
+
+// siteName is the og:site_name; rename it with the module.
+const siteName = "gothcc"
+
+// headSEO renders description, Open Graph, Twitter, canonical and JSON-LD tags.
+templ headSEO(p view.Page) {
+	if p.Description != "" {
+		<meta name="description" content={ p.Description }/>
+		<meta property="og:description" content={ p.Description }/>
+		<meta name="twitter:description" content={ p.Description }/>
+	}
+	<meta property="og:type" content="website"/>
+	<meta property="og:site_name" content={ siteName }/>
+	<meta property="og:title" content={ p.Title }/>
+	<meta name="twitter:title" content={ p.Title }/>
+	if p.Image != "" {
+		<meta name="twitter:card" content="summary_large_image"/>
+		<meta property="og:image" content={ p.Image }/>
+		<meta name="twitter:image" content={ p.Image }/>
+	} else {
+		<meta name="twitter:card" content="summary"/>
+	}
+	if p.URL != "" {
+		<meta property="og:url" content={ p.URL }/>
+		<link rel="canonical" href={ p.URL }/>
+	}
+	// JSON-LD documents come from json.Marshal, which escapes <, > and &, so
+	// they cannot close the script element.
+	for _, doc := range p.JSONLD {
+		@templ.Raw(`<script type="application/ld+json">` + doc + `</script>`)
+	}
+}
+
+// Layout is the base page wrapper. Content is passed as templ children.
+templ Layout(p view.Page) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title }</title>
-			<meta name="description" content={ description }/>
-			<link rel="stylesheet" href="/static/css/app.css"/>
+			<title>{ p.Title }</title>
+			@headSEO(p)
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"/>
+			<link rel="stylesheet" href={ asset("/static/css/app.css") }/>
 			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
 		</head>
 		<body class="min-h-screen flex flex-col bg-neutral-50 text-neutral-900 font-sans">

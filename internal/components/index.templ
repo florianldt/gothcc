@@ -1,9 +1,12 @@
 package components
 
-import "example.com/gothcc/internal/database/db"
+import (
+	"example.com/gothcc/internal/database/db"
+	"example.com/gothcc/internal/view"
+)
 
-templ Index(count int64, messages []db.Message) {
-	@Layout("gothcc — HTMX · templ · sqlc · Tailwind · chi", "A minimal Go web starter.") {
+templ Index(p view.Page, count int64, messages []db.Message) {
+	@Layout(p) {
 		<section class="mb-16">
 			<p class="text-xs uppercase tracking-widest text-neutral-500 mb-3">Starter template</p>
 			<h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-neutral-900 mb-4">

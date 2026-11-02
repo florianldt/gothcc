@@ -1,8 +1,15 @@
 name: Deploy
 
+# Builds the image on every master push and asks Dokploy to redeploy it.
 on:
   push:
-    branches: [main]
+    branches: [master]
+  workflow_dispatch:
+
+# One deploy at a time, and never cancel one halfway.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
@@ -44,6 +51,14 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cache,mode=max
 
+      # Skipped until the Dokploy app exists and its webhook is saved as the
+      # DOKPLOY_WEBHOOK_URL repository secret.
       - name: Trigger Dokploy redeploy
+        env:
+          WEBHOOK: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
         run: |
-          curl -s -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}"
+          if [ -z "$WEBHOOK" ]; then
+            echo "::notice::DOKPLOY_WEBHOOK_URL is not set; image pushed, no redeploy triggered."
+            exit 0
+          fi
+          curl -fsS -X POST "$WEBHOOK"
